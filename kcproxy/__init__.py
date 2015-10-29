@@ -26,6 +26,8 @@ class KCProxy(object):
         self.cache = cache
         self.app = app
 
+        self.session = requests.Session()
+
     def init_app(self, app: flask.Flask):
         """
         Late app init.
@@ -70,19 +72,19 @@ class KCProxy(object):
             data = f.read()
         if cache:
             self.cache.set(cache_key, data)
-            self.cache.expire(cache_key, 300)
+            self.cache.expire(cache_key, self.app.config.get("CACHE_TIME", 300))
         return data
 
     def _dmm_request(self, path: pathlib.Path, params: tuple, cache_key: str, method: str, cache: bool):
         # Create a new request object.
-        r = requests.request(method=method,
+        r = self.session.request(method=method,
                 url="http://" + self.app.config["SERVER_IP"] + ("/" if str(path)[0] != "/" else "") + str(path),
                 params=params[0].to_dict(flat=True) if params[0] else None,
                 data=params[1].to_dict(flat=True) if params[1] else None,
                 headers=self._falsify_headers())
         if cache:
             self.cache.set(cache_key, r.content)
-            self.cache.expire(cache_key, 300)
+            self.cache.expire(cache_key, self.app.config.get("CACHE_TIME", 300))
         return r.status_code, r.content
 
     def _falsify_headers(self):
@@ -90,4 +92,6 @@ class KCProxy(object):
             "Origin": "http://{}".format(self.server_ip),
             "User-Agent": "Mozilla/5.0 (Windows NT 6.3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/46.0.2490.80  Safari/537.36",
         }
+
+
 
