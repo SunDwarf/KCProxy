@@ -27,9 +27,9 @@ logger = logging.getLogger("kcproxy")
 try:
     import redis
 except ImportError:
-    app.config["ENABLE_CACHING"] = False
+    app.config["ENABLE_CACHE"] = False
 
-if app.config["ENABLE_CACHING"]:
+if app.config["ENABLE_CACHE"]:
     our_redis = redis.Redis(
         host=app.config["REDIS_HOST"],
         port=app.config["REDIS_PORT"],
