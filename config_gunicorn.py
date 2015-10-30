@@ -6,8 +6,8 @@ workers = multiprocessing.cpu_count() * 2 + 1
 
 # Choose one as appropriate.
 # worker_class = "sync"
-# worker_class = "eventlet"
-worker_class = "gevent"
+worker_class = "eventlet"
+# worker_class = "gevent"
 # worker_class = "tornado"
 
 
